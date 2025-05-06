@@ -4,6 +4,7 @@
 #include "user/user.h"
 #include "kernel/fcntl.h"
 
+
 // Parsed command representation
 #define EXEC  1
 #define REDIR 2
@@ -12,6 +13,18 @@
 #define BACK  5
 
 #define MAXARGS 10
+
+
+char* strcat(char *dest, const char *src) {
+  char *ptr = dest + strlen(dest); 
+  while(*src != '\0') {
+    *ptr++ = *src++;  
+  }
+  *ptr = '\0';  
+  return dest;
+}
+
+
 
 struct cmd {
   int type;
@@ -74,49 +87,53 @@ runcmd(struct cmd *cmd)
 
   case EXEC:
     ecmd = (struct execcmd*)cmd;
-    char str[1000];
-    strcpy(str, ecmd->argv[0]);
-
-    ////case of nothing to run(empty)
-    if(ecmd->argv[0] == 0)
-      exit(1);
-    /////case of !<message>
-    else if(ecmd->argv[0] && str[0]=='!'){
   
-      ///1.benig long
-      int len = strlen(str);
-      if (len > 512) {
-          printf("Message is too long\n");
-          exit(0);
+    ///no message part
+    if(ecmd->argv[0] == 0)
+      exit(0);
+    
+    /// starting with the ! 
+    else if(ecmd->argv[0][0] == '!') {
+  
+      ///calculating the string 
+      char str[1000] = "";
+    
+      for(int i = 0; i < MAXARGS && ecmd->argv[i]; i++) {
+        strcat(str, ecmd->argv[i]);
+        strcat(str, " ");
       }
 
-     ////2.not being long 
-      char *s = str + 1;
-
-      for (int i = 0; s[i]; ) {
+      int len = strlen(str);
+  
+      if(len > 512) {
+          printf("Message is too long\n");
+      }
+      else {
+        char *s = str + 1;
+  
+        for (int i = 0; s[i];) {
           if (s[i] == 'o' && s[i+1] == 's') {
               write(1, "\x1b[34mos\x1b[0m", 13);
               i += 2;
           } else {
-              write(1, s+i, 1);
+              write(1, s + i, 1);
               i++;
           }
+        }
+        write(1, "\n", 1);
       }
-      write(1, "\n", 1);
-      
 
-
-
+      exit(0);
     }
+    //// not empty and not starting with !
     else {
-       
-    exec(ecmd->argv[0], ecmd->argv);
-    fprintf(2, "exec %s failed\n", ecmd->argv[0]);
+      exec(ecmd->argv[0], ecmd->argv);
+      fprintf(2, "exec %s failed\n", ecmd->argv[0]);
+      exit(1);
     }
-
-    exit(0);
-
+  
     break;
+  
 
 
   case REDIR:
