@@ -3,6 +3,7 @@
 #include "memlayout.h"
 #include "riscv.h"
 #include "defs.h"
+#include "custom_logger.h"
 
 volatile static int started = 0;
 
@@ -29,6 +30,12 @@ main()
     fileinit();      // file table
     virtio_disk_init(); // emulated hard disk
     userinit();      // first user process
+   
+    /////log message :
+    log_message(0,"Welcome to AUT MCS Principles of Operating Systems Course. This message is from a custom logger implemented by 9924034");
+    log_message(1,"This is a test warning message for the custom logger");
+    log_message(2,"This is a test error message for the custom logger");
+
     __sync_synchronize();
     started = 1;
   } else {
