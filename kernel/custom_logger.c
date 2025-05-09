@@ -1,25 +1,23 @@
+
 #include "types.h"
 #include "riscv.h"
-#include "logger.h"
-#include "defs.h"
-void log_message(int level, const char *message) {
+#include "custom_logger.h"
 
-    if(level==1){
+extern int printf(const char *fmt, ...);
 
-
-
-    }else if(level==2){
-
-
-    }else if(level==3){
-
-
-    }else{
-
-        
-    }
-
-
-
+void
+log_message(int level, const char *message) {
+  switch(level) {
+    case 0:
+      printf("INFO    - %s\n", message);
+      break;
+    case 1:
+      printf("WARNING - %s\n", message);
+      break;
+    case 2:
+      printf("ERROR   - %s\n", message);
+      break;
+    default:
+      printf("UNKNOWN - %s\n", message);
+  }
 }
-
