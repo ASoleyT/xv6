@@ -6,6 +6,9 @@
 #include "proc.h"
 #include "defs.h"
 
+
+
+
 struct cpu cpus[NCPU];
 
 struct proc proc[NPROC];
@@ -17,6 +20,9 @@ struct spinlock pid_lock;
 
 extern void forkret(void);
 static void freeproc(struct proc *p);
+int thread_schd(struct proc *p);
+struct thread* initthread(struct proc *p);
+
 
 extern char trampoline[]; // trampoline.S
 
@@ -714,7 +720,7 @@ struct thread
   
   struct proc *p = myproc();
 
-  if (!initthread(p))
+  if (initthread(p)== 0)
   return 0;
 
   for (struct thread *t = p->threads; t < p->threads + NTHREAD; t++) {
